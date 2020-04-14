@@ -27,4 +27,12 @@ class LoginController extends Controller
     		return redirect()->back();
     	}
     }
+    
+    public function logout()
+    {
+        Auth::logout(); // logout user
+
+        // redirect ke halaman login
+        return redirect()->route("login");
+    }
 }
