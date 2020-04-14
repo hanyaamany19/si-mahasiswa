@@ -5,6 +5,7 @@
     <h1>
         Daftar Mahasiswa
         <a href="{{ route('biodata.create') }}" type="button" class="btn btn-primary" style="float: right;">Tambah</a>
+        <a href="{{ action('ExportExcelController@export') }}" class="btn btn-success">Export to Excel</a>
     </h1>
     
     <br>

@@ -55,3 +55,5 @@ Route::get("/logout", "LoginController@logout")->name("logout");
 Route::resource("biodata", "BiodataController")->middleware("web");
 
 Route::get("/biodata/{biodatum}/delete", "BiodataController@destroy")->name("biodata.destroy");
+
+Route::get('export', 'ExportExcelController@export');
