@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\BiodataMahasiswa;
-use Illuminate\Support\Facades\Validator;
 use DataTables;
-use Yajra\DataTables\Html\Button;
-use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
-use Yajra\DataTables\Services\DataTable;
-
+use Yajra\DataTables\Html\Builder;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\UpdateBiodata;
+use App\Exports\MahasiswaExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\Controller;
 
 class BiodataController extends Controller
 {
@@ -20,11 +19,41 @@ class BiodataController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Builder $builder)
     {
         //
-        $mahasiswa = BiodataMahasiswa::all();
-        return view("biodata.index", compact("mahasiswa"));
+        // $mahasiswa = BiodataMahasiswa::all();
+        // return view("biodata.index", compact("mahasiswa"));
+
+        if (request()->ajax()) {
+            return DataTables::of(BiodataMahasiswa::query())->editColumn("nim", function($data){
+                return "<strong><i>" . $data->nim . "</i></strong>";
+            })->addColumn("action", function($data){
+                return "
+                <a href='" . route("biodata.show", ["id" => $data->id]) ."' class='btn btn-success'>Detail</a>
+                <a href='" . route("biodata.edit", ["id" => $data->id]) ."' class='btn btn-warning'>Edit</a>
+                <a href='" . route("biodata.destroy", ["id" => $data->id]) ."' class='btn btn-danger'>Delete</button>";
+            })->rawColumns(["nim", "action"])->addIndexColumn()->toJson();
+        }
+
+        $html = $builder->columns([
+            ["data" => "DT_RowIndex", "name" => "#", "title" => "#", "defaultContent"=> "", "orderable" => false],
+            ["data" => "name", "name" => "name", "title" => "NAMA"],
+            ["data" => "nim", "nim" => "nim", "title" => "NIM"],
+            [
+                'defaultContent' => '',
+                'data'           => 'action',
+                'name'           => 'action',
+                'title'          => 'ACTION',
+                'render'         => null,
+                'orderable'      => false,
+                'searchable'     => false,
+                'exportable'     => false,
+                'printable'      => true,
+            ],
+        ]);
+
+        return view("biodata.index", compact("html"));
     }
 
     /**
@@ -88,15 +117,15 @@ class BiodataController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validation = Validator::make($request->all(), [
-            "name" => "string|min:3|max:10|alpha",
-            "nim" => "string|min:8",
-            "alamat" => "string|min:10",
-        ]);
+        // $validation = Validator::make($request->all(), [
+        //     "name" => "string|min:3|max:10|alpha",
+        //     "nim" => "string|min:8",
+        //     "alamat" => "string|min:10",
+        // ]);
 
-        if ($validation->fails()) {
-            return redirect()->back()->withErrors($validation)->withInput();
-        }
+        // if ($validation->fails()) {
+        //     return redirect()->back()->withErrors($validation)->withInput();
+        // }
 
         BiodataMahasiswa::where("id", $id)->update($request->except("_token", "_method"));
         return redirect()->route("biodata.index");
