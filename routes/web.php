@@ -53,3 +53,5 @@ Route::get("/logout", "LoginController@logout")->name("logout");
 // Route::get("/biodata/{biodatum}/delete", "BiodataController@destroy")->name("biodata.destroy");
 
 Route::get('export', 'ExportExcelController@export');
+
+Route::get("/mail/send", "MailController@send");
