@@ -17,8 +17,7 @@ class BiodataSeeder extends Seeder
          	BiodataMahasiswa::create([
          		"name" => "Mahasiswa ".$i,
          		"nim" => time().$i,
-         		"address" => "Kota Malang",
-                "foto" => "foto1"
+         		"address" => "Kota Malang"
          	]);
          }
      }

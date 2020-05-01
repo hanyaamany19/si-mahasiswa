@@ -19,40 +19,42 @@ class BiodataController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware(['auth']);
+    }
+
     public function index(Builder $builder)
     {
-        //
-        // $mahasiswa = BiodataMahasiswa::all();
-        // return view("biodata.index", compact("mahasiswa"));
-
-        if (request()->ajax()) {
-            return DataTables::of(BiodataMahasiswa::query())->editColumn("nim", function($data){
+         if (request()->ajax()) {
+            return DataTables::of(BiodataMahasiswa::query())->editColumn("nim", function ($data) {
                 return "<strong><i>" . $data->nim . "</i></strong>";
-            })->addColumn("action", function($data){
+            })->addColumn("action", function($data) {
                 return "
-                <a href='" . route("biodata.show", ["id" => $data->id]) ."' class='btn btn-success'>Detail</a>
-                <a href='" . route("biodata.edit", ["id" => $data->id]) ."' class='btn btn-warning'>Edit</a>
-                <a href='" . route("biodata.destroy", ["id" => $data->id]) ."' class='btn btn-danger'>Delete</button>";
+                <a href='" . route("biodata.show", ["id" => $data->id]) . "' class='btn btn-success'>Detail</a>
+                <a href='" . route("biodata.edit", ["id" => $data->id]) . "' class='btn btn-warning'>Edit</a>
+                <a href='" . route("biodata.destroy", ["id" => $data->id]) . "' class='btn btn-danger'>Delete</a>
+                ";
             })->rawColumns(["nim", "action"])->addIndexColumn()->toJson();
         }
 
         $html = $builder->columns([
-            ["data" => "DT_RowIndex", "name" => "#", "title" => "#", "defaultContent"=> "", "orderable" => false],
+            ["data" => "DT_RowIndex", "name" => "id", "title" => "#", "defaultContent" => "", "orderable" => false],
             ["data" => "name", "name" => "name", "title" => "NAMA"],
-            ["data" => "nim", "nim" => "nim", "title" => "NIM"],
-            [
-                'defaultContent' => '',
-                'data'           => 'action',
-                'name'           => 'action',
-                'title'          => 'ACTION',
-                'render'         => null,
-                'orderable'      => false,
-                'searchable'     => false,
-                'exportable'     => false,
-                'printable'      => true,
+            ["data" => "nim", "name" => "nim", "title" => "NIM"],
+            ['defaultContent' => '',
+             'data'           => 'action',
+             'name'           => 'action',
+             'title'          => 'ACTION',
+             'render'         => null,
+             'orderable'      => false,
+             'searchable'     => false,
+             'exportable'     => false,
+             'printable'      => true,
             ],
         ]);
-
+        // $mahasiswa = BiodataMahasiswa::all();
+        // dd(BiodataMahasiswa::)
         return view("biodata.index", compact("html"));
     }
 
@@ -74,12 +76,25 @@ class BiodataController extends Controller
      */
     public function store(Request $request)
     {
-        $filePath = $request->file("file")->store("public");
-        BiodataMahasiswa::create([
-            'name' => $request->name,
-            'nim' => $request->nim,
-            'address' => $request->address,
-            'foto' => $filePath]); 
+        // dd($request->file());
+        $filePath = $request->file("photo")->store("photo_mhs");
+        $photo_mhs = 'products-' .date('Ymdhis').'.'.$request->photo->getClientOriginalExtension();
+        $request->photo->move('photo_mhs', $photo_mhs);
+
+
+        $mahasiswa = new BiodataMahasiswa;
+        $mahasiswa->name = $request->name;
+        $mahasiswa->nim = $request->nim;
+        $mahasiswa->address = $request->address;
+
+        $mahasiswa->photo = $photo_mhs;
+        $mahasiswa->filePath = $filePath;
+
+
+        $mahasiswa->save();
+
+        // $filePath = $request->file("photo")->store("photo_mhs");
+        // return $filePath;
         return redirect()->route("biodata.index");
     }
 

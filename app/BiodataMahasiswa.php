@@ -16,6 +16,7 @@ class BiodataMahasiswa extends Model
     	"name",
     	"nim",
     	"address",
-        "foto"
+        "filePath",
+        "photo"
     ];
 }

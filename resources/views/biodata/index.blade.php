@@ -1,33 +1,67 @@
-@extends("layout")
+@section('js')
+<script type="text/javascript">
+      function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#showgambar').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#inputgambar").change(function () {
+        readURL(this);
+    });
+</script>
+
+@stop
+@extends("layout.app")
 
 @push("style")
-
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.16/datatables.min.css"/>
-
+     <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+     <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
 @endpush
 
 @section("content")
 
-    <h1>Daftar Mahasiswa</h1>
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1 class="m-0 text-dark">Daftar Mahasiswa</h1>
+              </div><!-- /.col -->
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="#">Kelola Mahasiswa</a></li>
+                  <li class="breadcrumb-item active">Daftar Mahasiswa</li>
+                </ol>
+              </div><!-- /.col -->
+            </div><!-- /.row -->
+          </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
 
-    <a href="{{ route('biodata.create') }}" type="button" class="btn btn-primary" style="float: right;">Tambah</a>
-    <a href="{{ action('ExportExcelController@export') }}" class="btn btn-success">Export to Excel</a>
-    <p></p>
 
-            <!-- <a href="/biodata-mahasiswa/create" class="btn btn-info"> + Tambah Data Mahasiswa</a>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        {!!$html->table()!!}
+                    </div>
+                </div>
+            </div>
+        </section>
+        
 
-            <br><br>
-
-            <a href="/biodata-mahasiswa/export_excel" class="btn btn-success my-3" target="_blank">EXPORT EXCEL</a>
-
-            <br><br> -->
-
-    {!! $html->table() !!}
-
-@endsection
+   
+@endsection("content")
 
 @push("script")
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.16/datatables.min.js"></script>
-
+    <!-- DataTables -->
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<!--     <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script> -->
     {!! $html->scripts() !!}
 @endpush
